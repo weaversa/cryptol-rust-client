@@ -1,0 +1,11 @@
+[package]
+name = "cryptol-rust-client"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+jsonrpsee = { version = "0.16.2", features = [ "jsonrpsee-core", "jsonrpsee-http-client" ] }
+tokio = { version = "1", features = [ "full" ] }
+serde_json = { version = "1.0" }
+serde = { version = "1.0" }
