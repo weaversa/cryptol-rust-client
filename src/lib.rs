@@ -20,7 +20,7 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct CryptolResult {
-  answer: Vec<Option<String>>, //serde_json::Value>>,
+  answer: Vec<Option<serde_json::Value>>, //String>>,
   state:  String,
   stderr: String,
   stdout: String,
@@ -99,7 +99,7 @@ impl CryptolClient {
     // Build client
     let client = HttpClientBuilder::default()
       .set_headers(headers)
-      .request_timeout(Duration::from_secs(60 * 60)) // Set longer request timeout
+      .request_timeout(Duration::from_secs(60 * 60))  // Set longer request timeout
       .build(cryptol_server_url)?;
 
     // Create parameters for loading the Cryptol prelude.
