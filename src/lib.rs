@@ -27,6 +27,33 @@ struct CryptolResult {
 }
 
 /**
+ * This structure represents the JSON blob returned by cryptol-remote-api on error.
+ * For example:
+ * {"code":20500,"data":{"data":{"path":["client","//.cryptol","/usr/local/share/cryptol"],"source":"Floataboat","warnings":[]},"stderr":"","stdout":""},"message":"[error] Could not find module Floataboat\nSearched paths:\n    //.cryptol\n    /usr/local/share/cryptol\nSet the CRYPTOLPATH environment variable to search more directories"}
+ */
+
+#[derive(Serialize, Deserialize)]
+pub struct CryptolError {
+    code: i64,
+    data: CryptolErrorData,
+    message: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct CryptolErrorData {
+    data: CryptolDataData,
+    stderr: String,
+    stdout: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct CryptolDataData {
+    path: Vec<String>,
+    source: String,
+    warnings: Vec<Option<serde_json::Value>>,
+}
+
+/**
  * Cryptol client struct. Contains the active client connection and
  * state attribute.
  */
@@ -97,7 +124,7 @@ impl CryptolClient {
    */
 
   #[tokio::main]
-  async fn load_module(&mut self, module: &str) -> Result<String> {
+  async fn load_module(&mut self, module: &str) -> Result<()> {
     // Create parameters for loading the give Cryptol module.
     let mut params = ObjectParams::new();
     params.insert("module name", module).unwrap();
@@ -106,10 +133,18 @@ impl CryptolClient {
     // Make a request to cryptol-remote-api to load the Cryptol prelude
     let response: CryptolResult = self.client.request("load module", params).await?;
 
+    /* It would be nice to parse out any failure from this response.
+     * See the `CryptolError` struct above -- Cryptol does return a
+     * nice `message` with pertinent inforamtion about the failure.
+     * Right now I'm not sure how to access the JSON blob when
+     * `request` returns Err, and the actual Err message does not
+     * contain much information.
+     */
+
     // Update the CryptolClient state.
     self.state = response.state.clone();
 
-    Ok(response.state.clone())
+    Ok(())
   }
   
 }
@@ -126,10 +161,29 @@ mod tests {
     }
 
     #[test]
-    fn test_load_module() {
-      let cryptol_client = &mut CryptolClient::connect().unwrap();
-      cryptol_client.load_module("Float");
-      println!("{:?}", cryptol_client);
+    fn test_load_module_success() {
+      let mut cryptol_client = match CryptolClient::connect() {
+        Ok(c) => c,
+        Err(e) => panic!("An error occurred while connection to cryptol-remote-api: {}", e),
+      };
+
+      match cryptol_client.load_module("SuiteB") {
+        Ok(()) => (),
+        Err(e) => panic!("Loading module failed: {}", e),
+      };
+    }
+
+    #[test]
+    fn test_load_module_failure() {
+      let mut cryptol_client = match CryptolClient::connect() {
+        Ok(c) => c,
+        Err(e) => panic!("An error occurred while connection to cryptol-remote-api: {}", e),
+      };
+
+      match cryptol_client.load_module("nosuchmodule") {
+        Ok(()) => panic!("nosuchmodule should not exist"),
+        Err(e) => (),
+      };
     }
 
 }
