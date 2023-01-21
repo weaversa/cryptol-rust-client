@@ -34,22 +34,22 @@ struct CryptolResult {
 
 #[derive(Serialize, Deserialize)]
 pub struct CryptolError {
-    code: i64,
-    data: CryptolErrorData,
+    code:    i64,
+    data:    CryptolErrorData,
     message: String,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct CryptolErrorData {
-    data: CryptolDataData,
+    data:   CryptolDataData,
     stderr: String,
     stdout: String,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct CryptolDataData {
-    path: Vec<String>,
-    source: String,
+    path:     Vec<String>,
+    source:   String,
     warnings: Vec<Option<serde_json::Value>>,
 }
 
@@ -104,8 +104,8 @@ impl CryptolClient {
 
     // Create parameters for loading the Cryptol prelude.
     let mut params = ObjectParams::new();
-    params.insert("module name", "Cryptol").unwrap();
     params.insert("state", json!(null)).unwrap();
+    params.insert("module name", "Cryptol").unwrap();
 
     // Make a request to cryptol-remote-api to load the Cryptol prelude
     let response: CryptolResult = client.request("load module", params).await?;
@@ -125,10 +125,10 @@ impl CryptolClient {
 
   #[tokio::main]
   async fn load_module(&mut self, module: &str) -> Result<()> {
-    // Create parameters for loading the give Cryptol module.
+    // Create parameters for loading the given Cryptol module.
     let mut params = ObjectParams::new();
-    params.insert("module name", module).unwrap();
     params.insert("state", json!(self.state)).unwrap();
+    params.insert("module name", module).unwrap();
 
     // Make a request to cryptol-remote-api to load the Cryptol prelude
     let response: CryptolResult = self.client.request("load module", params).await?;
@@ -146,7 +146,44 @@ impl CryptolClient {
 
     Ok(())
   }
-  
+
+  /**
+   * This function calls the given function in the loaded Cryptol module.
+   *
+   * This function has asynchronous behavior due to the POST request to
+   * cryptol-remote-api. We block on the request using #[tokio::main].
+   *
+   * Sample JSON for this:
+   *   {"function": "sha384", "arguments": ["1 : [16]"], "state": "7dc51618-e655-49a3-9a72-880eeb8e16dd"}
+   *
+   *   {"answer":{"type":{"forall":[],"propositions":[],"type":{"type":"bitvector","width":{"type":"number","value":384}}},"type string":"[384]","value":{"data":"5d13bb39a64c4ee16e0e8d2e1c13ec4731ff1ac69652c072d0cdc355eb9e0ec41b08aef3dd6fe0541e9fa9e3dcc80f7b","encoding":"hex","expression":"bits","width":384}},"state":"fa57d2ec-afa8-4d7a-b1f2-f3b47412f13d","stderr":"","stdout":""}
+   */
+
+  #[tokio::main]
+  async fn call<P: Serialize>(&mut self, function: &str, arguments: P) -> Result<()> {
+    // Create parameters for loading the given Cryptol module.
+    let mut params = ObjectParams::new();
+    params.insert("state", json!(self.state)).unwrap();
+    params.insert("function", json!(function)).unwrap();
+    params.insert("arguments", arguments).unwrap();
+
+    // Make a request to cryptol-remote-api to load the Cryptol prelude
+    let response: CryptolResult = self.client.request("call", params).await?;
+
+    /* It would be nice to parse out any failure from this response.
+     * See the `CryptolError` struct above -- Cryptol does return a
+     * nice `message` with pertinent inforamtion about the failure.
+     * Right now I'm not sure how to access the JSON blob when
+     * `request` returns Err, and the actual Err message does not
+     * contain much information.
+     */
+
+    // Update the CryptolClient state.
+    self.state = response.state.clone();
+
+    Ok(())
+  }
+
 }
 
 #[cfg(test)]
