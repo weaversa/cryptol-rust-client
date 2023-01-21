@@ -20,7 +20,7 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct CryptolResult {
-  answer: Vec<Option<serde_json::Value>>, //String>>,
+  answer: Option<serde_json::Value>,
   state:  String,
   stderr: String,
   stdout: String,
