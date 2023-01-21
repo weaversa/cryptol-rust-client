@@ -31,7 +31,7 @@ struct CryptolResult {
  * state attribute.
  */
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct CryptolClient {
   client: HttpClient,
   state:  String,
@@ -54,8 +54,7 @@ impl CryptolClient {
    */
 
   #[tokio::main]
-  async fn connect() -> Result<Self> {
-
+  async fn connect() -> Result<CryptolClient> {
     // Deduce whether or not `CRYPTOL_SERVER_URL` is defined.
     let cryptol_server_url = match env::var("CRYPTOL_SERVER_URL") {
       Ok(val) => {
@@ -89,6 +88,30 @@ impl CryptolClient {
     Ok(CryptolClient { client: client, state: response.state.clone() })
   }
 
+  /**
+   * This function loads the given Cryptol module existing in the
+   * CRYPTOL_PATH of cryptol-remote-api.
+   *
+   * This function has asynchronous behavior due to the POST request to
+   * cryptol-remote-api. We block on the request using #[tokio::main].
+   */
+
+  #[tokio::main]
+  async fn load_module(&mut self, module: &str) -> Result<String> {
+    // Create parameters for loading the give Cryptol module.
+    let mut params = ObjectParams::new();
+    params.insert("module name", module).unwrap();
+    params.insert("state", json!(self.state)).unwrap();
+
+    // Make a request to cryptol-remote-api to load the Cryptol prelude
+    let response: CryptolResult = self.client.request("load module", params).await?;
+
+    // Update the CryptolClient state.
+    self.state = response.state.clone();
+
+    Ok(response.state.clone())
+  }
+  
 }
 
 #[cfg(test)]
@@ -97,8 +120,16 @@ mod tests {
 
     #[test]
     fn test_connect() {
-      let mut cryptol_client = CryptolClient::connect();
+      let cryptol_client = CryptolClient::connect();
       assert!(cryptol_client.is_ok());
       println!("{:?}", cryptol_client);
     }
+
+    #[test]
+    fn test_load_module() {
+      let cryptol_client = &mut CryptolClient::connect().unwrap();
+      cryptol_client.load_module("Float");
+      println!("{:?}", cryptol_client);
+    }
+
 }
