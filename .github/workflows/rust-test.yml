@@ -5,15 +5,18 @@ on: [push, pull_request]
 jobs:
   rust-test:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/weaversa/cryptol-course:2.13
-      options: --user root
+    services:
+      cryptol-remote-api:
+        image: ghcr.io/galoisinc/cryptol-remote-api:2.13.0
+        ports:
+          - 3829:3829
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - name: Set Environment Variable
+        run: echo "CRYPTOL_SERVER_URL=http://0.0.0.0:3829" >> $GITHUB_ENV
+      - name: Rust Tests
+        uses: actions-rs/toolchain@v1
         with: 
           toolchain: stable
-      - run: start-cryptol-remote-api-read-only
-      - run: python3 test.py
-      #- run: cargo test -- --nocapture
+      - run: cargo test -- --nocapture
