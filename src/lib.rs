@@ -1,11 +1,10 @@
 use std::env;
 
 use serde::{Serialize, Deserialize};
-use serde_json::{json, from_str, Value};
+use serde_json::{json};
 
 use jsonrpsee::core::client::ClientT;
 use jsonrpsee::http_client::{ HeaderMap, HeaderValue, HttpClientBuilder, HttpClient };
-use jsonrpsee::rpc_params;
 use jsonrpsee::core::params::ObjectParams;
 
 use std::time::Duration;
@@ -78,7 +77,7 @@ pub struct CryptolDataData {
  */
 
 #[derive(Debug, Clone)]
-struct CryptolClient {
+pub struct CryptolClient {
   client: HttpClient,
   state:  String,
   answer: serde_json::Value,
@@ -101,7 +100,7 @@ impl CryptolClient {
    */
 
   #[tokio::main]
-  async fn connect() -> Result<CryptolClient> {
+  pub async fn connect() -> Result<CryptolClient> {
     // Deduce whether or not `CRYPTOL_SERVER_URL` is defined.
     let cryptol_server_url = match env::var("CRYPTOL_SERVER_URL") {
       Ok(val) => {
@@ -207,12 +206,42 @@ impl CryptolClient {
     // Update the CryptolClient answer.
     self.answer = serde_json::from_value(response.answer).unwrap();
 
-    println!("{:?}", self);
+    //println!("cryptol_client = {:?}", self);
 
     Ok(())
   }
 
 }
+
+  /**
+   * This function calls SHA384 from the cryptol-remote-api.
+   */
+
+  pub fn sha384(mut cryptol_client: CryptolClient, input: &str) -> Result<String> {
+
+    // Load the `SuiteB` module
+    match cryptol_client.load_module("SuiteB") {
+      Ok(()) => (),
+      Err(e) => panic!("Loading module failed: {}", e),
+    };
+
+    // Add the input to the list of input parameters
+    // and call Cryptol's `sha384`.
+    // TODO: Enforce `input` is a hex formatted string
+    let arguments = vec![input];
+    match cryptol_client.call("sha384", arguments) {
+      Ok(()) => (),
+      Err(e) => panic!("SHA384 call failed: {}", e),
+    };
+
+    let answer: Answer = serde_json::from_value(cryptol_client.answer).unwrap();
+    let sha384_result: SHA384ResultValue = serde_json::from_value(answer.value).unwrap();
+
+    //println!("sha384 {} == {}", input, sha384_result.data);
+
+    Ok(sha384_result.data)
+
+  }
 
 #[cfg(test)]
 mod tests {
@@ -222,7 +251,7 @@ mod tests {
   fn test_connect() {
     let cryptol_client = CryptolClient::connect();
     assert!(cryptol_client.is_ok());
-    println!("{:?}", cryptol_client);
+    //println!("cryptol_client = {:?}", cryptol_client);
   }
 
   #[test]
@@ -253,26 +282,17 @@ mod tests {
 
   #[test]
   fn test_call_sha384_success() {
-    let mut cryptol_client = match CryptolClient::connect() {
+    let cryptol_client = match CryptolClient::connect() {
       Ok(c) => c,
       Err(e) => panic!("An error occurred while connection to cryptol-remote-api: {}", e),
     };
 
-    match cryptol_client.load_module("SuiteB") {
-      Ok(()) => (),
-      Err(e) => panic!("Loading module failed: {}", e),
+    let result = match sha384(cryptol_client, "0x0001") {
+      Ok(r) => r,
+      Err(e) => panic!("An error occured while calling sha384: {}", e),
     };
 
-    let arguments = vec!["1 : [16]"];
-    match cryptol_client.call("sha384", arguments) {
-      Ok(()) => (),
-      Err(e) => panic!("SHA384 call failed: {}", e),
-    };
-
-    let answer: Answer = serde_json::from_value(cryptol_client.answer).unwrap();
-    let sha384_result: SHA384ResultValue = serde_json::from_value(answer.value).unwrap();
-
-    assert_eq!(sha384_result.data, "5d13bb39a64c4ee16e0e8d2e1c13ec4731ff1ac69652c072d0cdc355eb9e0ec41b08aef3dd6fe0541e9fa9e3dcc80f7b");
+    assert_eq!(result, "5d13bb39a64c4ee16e0e8d2e1c13ec4731ff1ac69652c072d0cdc355eb9e0ec41b08aef3dd6fe0541e9fa9e3dcc80f7b");
   }
 
 }
