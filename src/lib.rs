@@ -247,7 +247,7 @@ mod tests {
 
     match cryptol_client.load_module("nosuchmodule") {
       Ok(()) => panic!("nosuchmodule should not exist"),
-      Err(e) => (),
+      Err(_) => (),
     };
   }
 
