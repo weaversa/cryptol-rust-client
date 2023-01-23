@@ -182,7 +182,7 @@ impl CryptolClient {
    */
 
   #[tokio::main]
-  async fn call<P: Serialize>(&mut self, function: &str, arguments: Vec<P>) -> Result<()> {
+  async fn call<P: Serialize>(&mut self, function: &str, arguments: Vec<P>) -> Result<Answer> {
     // Create parameters for loading the given Cryptol module.
     let mut params = ObjectParams::new();
     params.insert("state", json!(self.state)).unwrap();
@@ -204,44 +204,39 @@ impl CryptolClient {
     self.state = response.state.clone();
 
     // Update the CryptolClient answer.
-    self.answer = serde_json::from_value(response.answer).unwrap();
+    self.answer = response.answer.clone();
 
-    //println!("cryptol_client = {:?}", self);
-
-    Ok(())
+    // Let `call` return the result as an Answer struct.
+    let answer: Answer = serde_json::from_value(response.answer).unwrap();
+    
+    Ok(answer)
   }
-
 }
 
-  /**
-   * This function calls SHA384 from the cryptol-remote-api.
-   */
+/**
+ * This function calls SHA384 from the cryptol-remote-api.
+ */
 
-  pub fn sha384(mut cryptol_client: CryptolClient, input: &str) -> Result<String> {
+pub fn sha384(mut cryptol_client: CryptolClient, input: &str) -> Result<String> {
+  // Load Cryptol's `SuiteB` module.
+  match cryptol_client.load_module("SuiteB") {
+    Ok(()) => (),
+    Err(e) => panic!("Loading module failed: {}", e),
+  };
 
-    // Load the `SuiteB` module
-    match cryptol_client.load_module("SuiteB") {
-      Ok(()) => (),
-      Err(e) => panic!("Loading module failed: {}", e),
-    };
+  // Add the input to the list of input parameters and call Cryptol's `sha384`.
+  let arguments = vec![input];
+  let answer = match cryptol_client.call("sha384", arguments) {
+    Ok(a) => (a),
+    Err(e) => panic!("SHA384 call failed: {}", e),
+  };
 
-    // Add the input to the list of input parameters
-    // and call Cryptol's `sha384`.
-    // TODO: Enforce `input` is a hex formatted string
-    let arguments = vec![input];
-    match cryptol_client.call("sha384", arguments) {
-      Ok(()) => (),
-      Err(e) => panic!("SHA384 call failed: {}", e),
-    };
+  // Transform the resulting JSON into a `SHA384ResultValue` type.
+  let sha384_result: SHA384ResultValue = serde_json::from_value(answer.value).unwrap();
 
-    let answer: Answer = serde_json::from_value(cryptol_client.answer).unwrap();
-    let sha384_result: SHA384ResultValue = serde_json::from_value(answer.value).unwrap();
-
-    //println!("sha384 {} == {}", input, sha384_result.data);
-
-    Ok(sha384_result.data)
-
-  }
+  // Prepend '0x' to the resulting hex string.
+  Ok(format!("0x{}", sha384_result.data))
+}
 
 #[cfg(test)]
 mod tests {
@@ -292,7 +287,7 @@ mod tests {
       Err(e) => panic!("An error occured while calling sha384: {}", e),
     };
 
-    assert_eq!(result, "5d13bb39a64c4ee16e0e8d2e1c13ec4731ff1ac69652c072d0cdc355eb9e0ec41b08aef3dd6fe0541e9fa9e3dcc80f7b");
+    assert_eq!(result, "0x5d13bb39a64c4ee16e0e8d2e1c13ec4731ff1ac69652c072d0cdc355eb9e0ec41b08aef3dd6fe0541e9fa9e3dcc80f7b");
   }
 
 }
