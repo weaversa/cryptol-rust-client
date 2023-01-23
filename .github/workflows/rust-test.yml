@@ -15,4 +15,5 @@ jobs:
         with: 
           toolchain: stable
       - run: start-cryptol-remote-api-read-only
-      - run: cargo test -- --nocapture
+      - run: python3 test.py
+      #- run: cargo test -- --nocapture
