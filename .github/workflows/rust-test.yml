@@ -11,7 +11,6 @@ jobs:
         ports:
           - 3829:3829
         options: >-
-          http
           --host 0.0.0.0 
           --port 3829
     steps:
