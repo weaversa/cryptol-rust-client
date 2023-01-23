@@ -13,10 +13,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Set Environment Variable
-        run: echo "CRYPTOL_SERVER_URL=http://cryptol-remote-api:3829" >> $GITHUB_ENV
       - name: Rust Tests
         uses: actions-rs/toolchain@v1
         with: 
           toolchain: stable
       - run: cargo test -- --nocapture
+        env:
+          CRYPTOL_SERVER_URL: http://cryptol-remote-api:3829
