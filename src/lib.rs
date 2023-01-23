@@ -227,7 +227,7 @@ pub fn sha384(mut cryptol_client: CryptolClient, input: &str) -> Result<String> 
   // Add the input to the list of input parameters and call Cryptol's `sha384`.
   let arguments = vec![input];
   let answer = match cryptol_client.call("sha384", arguments) {
-    Ok(a) => (a),
+    Ok(a) => a,
     Err(e) => panic!("SHA384 call failed: {}", e),
   };
 
