@@ -20,10 +20,29 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct CryptolResult {
-  answer: Option<serde_json::Value>,
+  #[serde(default)]
+  answer: serde_json::Value,
   state:  String,
   stderr: String,
   stdout: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Answer {
+    #[serde(rename = "type")]
+    answer_type: serde_json::Value,
+    #[serde(rename = "type string")]
+    type_string: String,
+    value: serde_json::Value,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SHA384ResultValue {
+    data: String,
+    encoding: String,
+    expression: String,
+    #[serde(default)]
+    width: Option<i64>,
 }
 
 /**
@@ -62,6 +81,7 @@ pub struct CryptolDataData {
 struct CryptolClient {
   client: HttpClient,
   state:  String,
+  answer: serde_json::Value,
 }
 
 /**
@@ -112,7 +132,9 @@ impl CryptolClient {
 
     // Create and return a new CryptolClient object to represent the
     // stateful connection
-    Ok(CryptolClient { client: client, state: response.state.clone() })
+    Ok(CryptolClient { client: client
+                     , state: response.state.clone()
+                     , answer: response.answer.clone() })
   }
 
   /**
@@ -142,7 +164,8 @@ impl CryptolClient {
      */
 
     // Update the CryptolClient state.
-    self.state = response.state.clone();
+    self.state  = response.state.clone();
+    self.answer = response.answer.clone();
 
     Ok(())
   }
@@ -160,12 +183,12 @@ impl CryptolClient {
    */
 
   #[tokio::main]
-  async fn call<P: Serialize>(&mut self, function: &str, arguments: P) -> Result<()> {
+  async fn call<P: Serialize>(&mut self, function: &str, arguments: Vec<P>) -> Result<()> {
     // Create parameters for loading the given Cryptol module.
     let mut params = ObjectParams::new();
     params.insert("state", json!(self.state)).unwrap();
     params.insert("function", json!(function)).unwrap();
-    params.insert("arguments", arguments).unwrap();
+    params.insert("arguments", json!(arguments)).unwrap();
 
     // Make a request to cryptol-remote-api to load the Cryptol prelude
     let response: CryptolResult = self.client.request("call", params).await?;
@@ -181,6 +204,11 @@ impl CryptolClient {
     // Update the CryptolClient state.
     self.state = response.state.clone();
 
+    // Update the CryptolClient answer.
+    self.answer = serde_json::from_value(response.answer).unwrap();
+
+    println!("{:?}", self);
+
     Ok(())
   }
 
@@ -188,39 +216,63 @@ impl CryptolClient {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+  use super::*;
 
-    #[test]
-    fn test_connect() {
-      let cryptol_client = CryptolClient::connect();
-      assert!(cryptol_client.is_ok());
-      println!("{:?}", cryptol_client);
-    }
+  #[test]
+  fn test_connect() {
+    let cryptol_client = CryptolClient::connect();
+    assert!(cryptol_client.is_ok());
+    println!("{:?}", cryptol_client);
+  }
 
-    #[test]
-    fn test_load_module_success() {
-      let mut cryptol_client = match CryptolClient::connect() {
-        Ok(c) => c,
-        Err(e) => panic!("An error occurred while connection to cryptol-remote-api: {}", e),
-      };
+  #[test]
+  fn test_load_module_success() {
+    let mut cryptol_client = match CryptolClient::connect() {
+      Ok(c) => c,
+      Err(e) => panic!("An error occurred while connection to cryptol-remote-api: {}", e),
+    };
 
-      match cryptol_client.load_module("SuiteB") {
-        Ok(()) => (),
-        Err(e) => panic!("Loading module failed: {}", e),
-      };
-    }
+    match cryptol_client.load_module("SuiteB") {
+      Ok(()) => (),
+      Err(e) => panic!("Loading module failed: {}", e),
+    };
+  }
 
-    #[test]
-    fn test_load_module_failure() {
-      let mut cryptol_client = match CryptolClient::connect() {
-        Ok(c) => c,
-        Err(e) => panic!("An error occurred while connection to cryptol-remote-api: {}", e),
-      };
+  #[test]
+  fn test_load_module_failure() {
+    let mut cryptol_client = match CryptolClient::connect() {
+      Ok(c) => c,
+      Err(e) => panic!("An error occurred while connection to cryptol-remote-api: {}", e),
+    };
 
-      match cryptol_client.load_module("nosuchmodule") {
-        Ok(()) => panic!("nosuchmodule should not exist"),
-        Err(e) => (),
-      };
-    }
+    match cryptol_client.load_module("nosuchmodule") {
+      Ok(()) => panic!("nosuchmodule should not exist"),
+      Err(e) => (),
+    };
+  }
+
+  #[test]
+  fn test_call_sha384_success() {
+    let mut cryptol_client = match CryptolClient::connect() {
+      Ok(c) => c,
+      Err(e) => panic!("An error occurred while connection to cryptol-remote-api: {}", e),
+    };
+
+    match cryptol_client.load_module("SuiteB") {
+      Ok(()) => (),
+      Err(e) => panic!("Loading module failed: {}", e),
+    };
+
+    let arguments = vec!["1 : [16]"];
+    match cryptol_client.call("sha384", arguments) {
+      Ok(()) => (),
+      Err(e) => panic!("SHA384 call failed: {}", e),
+    };
+
+    let answer: Answer = serde_json::from_value(cryptol_client.answer).unwrap();
+    let sha384_result: SHA384ResultValue = serde_json::from_value(answer.value).unwrap();
+
+    assert_eq!(sha384_result.data, "5d13bb39a64c4ee16e0e8d2e1c13ec4731ff1ac69652c072d0cdc355eb9e0ec41b08aef3dd6fe0541e9fa9e3dcc80f7b");
+  }
 
 }
