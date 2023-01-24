@@ -8,9 +8,9 @@ jobs:
     services:
       cryptol-remote-api:
         image: ghcr.io/michaelabernardo/cryptol-rust-client/cryptol-remote-api:latest
-	credentials:
-	  username: ${{ github.repository_owner }}
-	  password: ${{ secrets.GITHUB_TOKEN }}
+        credentials:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
         ports:
           - 8080:8080
         options: -v ${{ github.workspace }}:/home/cryptol
