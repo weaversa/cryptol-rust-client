@@ -7,7 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     services:
       cryptol-remote-api:
-        image: ghcr.io/galoisinc/cryptol-remote-api:2.13.0
+        image: ghcr.io/michaelabernardo/cryptol-rust-client/cryptol-remote-api:latest
+	credentials:
+	  username: ${{ github.repository_owner }}
+	  password: ${{ secrets.GITHUB_TOKEN }}
         ports:
           - 8080:8080
         options: -v ${{ github.workspace }}:/home/cryptol
