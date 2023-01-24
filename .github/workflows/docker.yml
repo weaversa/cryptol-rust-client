@@ -1,6 +1,6 @@
 name: docker
 
-on: [push, pull_request]
+on: deployment
 
 jobs:
   docker:
