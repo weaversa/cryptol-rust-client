@@ -10,8 +10,7 @@ jobs:
         image: ghcr.io/galoisinc/cryptol-remote-api:2.13.0
         ports:
           - 8080:8080
-        options: >-
-          --entrypoint /usr/local/bin/cryptol-remote-api --max-occupancy 1000
+        options: -v ${{ github.workspace }}:/home/cryptol
     steps:
       - name: Checkout
         uses: actions/checkout@v2
