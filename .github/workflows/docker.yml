@@ -23,4 +23,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: michaelabernardo/cryptol-remote-api:latest
+          tags: ghcr.io/michaelabernardo/cryptol-remote-api:latest
