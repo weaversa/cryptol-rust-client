@@ -253,7 +253,7 @@ mod tests {
   fn test_load_module_success() {
     let mut cryptol_client = match CryptolClient::connect() {
       Ok(c) => c,
-      Err(e) => panic!("An error occurred while connection to cryptol-remote-api: {}", e),
+      Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {}", e),
     };
 
     match cryptol_client.load_module("SuiteB") {
@@ -266,7 +266,7 @@ mod tests {
   fn test_load_module_failure() {
     let mut cryptol_client = match CryptolClient::connect() {
       Ok(c) => c,
-      Err(e) => panic!("An error occurred while connection to cryptol-remote-api: {}", e),
+      Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {}", e),
     };
 
     match cryptol_client.load_module("nosuchmodule") {
@@ -279,7 +279,7 @@ mod tests {
   fn test_call_sha384_success() {
     let cryptol_client = match CryptolClient::connect() {
       Ok(c) => c,
-      Err(e) => panic!("An error occurred while connection to cryptol-remote-api: {}", e),
+      Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {}", e),
     };
 
     let result = match sha384(cryptol_client, "0x0001") {
