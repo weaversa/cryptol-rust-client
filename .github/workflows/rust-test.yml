@@ -11,7 +11,7 @@ jobs:
         ports:
           - 8080:8080
         options: >-
-          --entrypoint ["/usr/local/bin/cryptol-remote-api", "http"]
+          --entrypoint ["/usr/local/bin/cryptol-remote-api", "--max-occupancy 1000"]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
