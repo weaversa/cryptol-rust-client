@@ -1,6 +1,9 @@
 name: docker
 
-on: deployment
+on:
+push:
+  paths:
+    - Dockerfile
 
 jobs:
   docker:
