@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       cryptol-remote-api:
-        image: ghcr.io/michaelabernardo/cryptol-rust-client/cryptol-remote-api:latest
+        image: ghcr.io/weaversa/cryptol-remote-api-max-occupancy:latest
         credentials:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
