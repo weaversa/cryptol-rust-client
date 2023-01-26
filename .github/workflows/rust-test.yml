@@ -1,0 +1,26 @@
+name: Rust Test
+
+on: [push, pull_request]
+
+jobs:
+  rust-test:
+    runs-on: ubuntu-latest
+    services:
+      cryptol-remote-api:
+        image: ghcr.io/weaversa/cryptol-remote-api-max-occupancy:latest
+        credentials:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        ports:
+          - 8080:8080
+        options: -v ${{ github.workspace }}:/home/cryptol
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Rust Tests
+        uses: actions-rs/toolchain@v1
+        with: 
+          toolchain: stable
+      - run: cargo test -- --nocapture
+        env:
+          CRYPTOL_SERVER_URL: http://0.0.0.0:8080
