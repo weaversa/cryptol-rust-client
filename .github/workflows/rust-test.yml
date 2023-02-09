@@ -21,6 +21,9 @@ jobs:
         uses: actions-rs/toolchain@v1
         with: 
           toolchain: stable
-      - run: cargo test -- --nocapture
+      - run: cargo test
+        env:
+          CRYPTOL_SERVER_URL: http://0.0.0.0:8080
+      - run: cargo test --example sha384
         env:
           CRYPTOL_SERVER_URL: http://0.0.0.0:8080

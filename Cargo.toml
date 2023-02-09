@@ -3,9 +3,16 @@ name = "cryptol-rust-client"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "cryptol_rust_client"
+path = "src/lib.rs"
+
+[[example]]
+name = "sha384"
 
 [dependencies]
-jsonrpsee = { version = "0.16.2", features = [ "jsonrpsee-core", "jsonrpsee-http-client" ] }
-tokio = { version = "1", features = [ "full" ] }
-serde_json = { version = "1.0" }
-serde = { version = "1.0" }
+jsonrpsee = { version = "0.16.2", features = ["jsonrpsee-core", "jsonrpsee-http-client"] }
+serde = "1.0.152"
+serde_json = "1.0.93"
+tokio = { version = "1.25.0", features = ["full"] }
+
