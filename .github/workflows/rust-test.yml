@@ -21,6 +21,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with: 
           toolchain: stable
+      - run: cargo doc --no-deps
       - run: cargo test
         env:
           CRYPTOL_SERVER_URL: http://0.0.0.0:8080
