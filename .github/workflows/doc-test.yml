@@ -1,4 +1,4 @@
-name: Cargo tests
+name: Docs Build and Test
 
 on: [push, pull_request]
 
@@ -21,9 +21,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with: 
           toolchain: stable
-      - run: cargo test
-        env:
-          CRYPTOL_SERVER_URL: http://0.0.0.0:8080
-      - run: cargo test --example sha384
-        env:
+      - run: cargo doc --no-deps
+      - run: cargo test --doc -- --show-output
+          env:
           CRYPTOL_SERVER_URL: http://0.0.0.0:8080

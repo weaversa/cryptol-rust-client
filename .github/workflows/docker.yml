@@ -3,7 +3,7 @@ name: docker
 on:
   push:
     paths:
-      - Dockerfile
+      - cryptol-remote-api-max-occupancy.Dockerfile
 
 jobs:
   docker:
