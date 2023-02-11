@@ -9,8 +9,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Rust Tests
-        uses: dtolnay/rust-toolchain
+        uses: dtolnay/rust-toolchain@stable
         with: 
-          toolchain: stable
           components: rustfmt
       - run: cargo fmt --all -- --check
