@@ -9,12 +9,12 @@ fn test_connect() {
 #[test]
 fn test_load_module_success() {
     let mut cryptol_client = match CryptolClient::connect() {
-        Ok(c)  => c,
+        Ok(c) => c,
         Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {e}"),
     };
-    
+
     match cryptol_client.load_module("SuiteB") {
-        Ok(_)  => (),
+        Ok(_) => (),
         Err(e) => panic!("Loading module failed: {e}"),
     };
 }
@@ -22,10 +22,10 @@ fn test_load_module_success() {
 #[test]
 fn test_load_module_failure() {
     let mut cryptol_client = match CryptolClient::connect() {
-        Ok(c)  => c,
+        Ok(c) => c,
         Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {e}"),
     };
-    
+
     if cryptol_client.load_module("nosuchmodule").is_ok() {
         panic!("nosuchmodule should not exist")
     }
@@ -34,15 +34,15 @@ fn test_load_module_failure() {
 #[test]
 fn test_call_success() {
     let mut cryptol_client = match CryptolClient::connect() {
-        Ok(c)  => c,
+        Ok(c) => c,
         Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {e}"),
     };
-    
-    let function  = "reverse";
+
+    let function = "reverse";
     let arguments = vec!["[1, 2, 3, 4]"];
-    
+
     match cryptol_client.call(function, arguments) {
-        Ok(r)  => r,
+        Ok(r) => r,
         Err(e) => panic!("An error occured while calling cryptol-remote-api: {e}"),
     };
 }
@@ -50,11 +50,11 @@ fn test_call_success() {
 #[test]
 fn test_call_failure() {
     let mut cryptol_client = match CryptolClient::connect() {
-        Ok(c)  => c,
+        Ok(c) => c,
         Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {e}"),
     };
 
-    let function  = "nonsense";
+    let function = "nonsense";
     let arguments = vec!["[1, 2, 3, 4]"];
 
     if cryptol_client.call(function, arguments).is_ok() {
