@@ -24,4 +24,5 @@ jobs:
         with:
           context: .
           push: true
+          file: cryptol-remote-api-max-occupancy.Dockerfile
           tags: ghcr.io/weaversa/cryptol-remote-api-max-occupancy:latest
