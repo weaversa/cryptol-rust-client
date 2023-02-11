@@ -23,5 +23,5 @@ jobs:
           toolchain: stable
       - run: cargo doc --no-deps
       - run: cargo test --doc -- --show-output
-          env:
+        env:
           CRYPTOL_SERVER_URL: http://0.0.0.0:8080
