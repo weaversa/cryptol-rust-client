@@ -21,6 +21,8 @@ jobs:
         uses: actions-rs/toolchain@v1
         with: 
           toolchain: stable
+      - run: rustup component add clippy
+      - run: cargo clippy --all-targets --all-features -- -D warnings
       - run: cargo doc --no-deps
       - run: cargo test
         env:

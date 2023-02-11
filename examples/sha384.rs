@@ -53,17 +53,17 @@ fn main() {
 
     let cryptol_client = match CryptolClient::connect() {
         Ok(c)  => c,
-        Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {}", e),
+        Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {e}"),
     };
 
-    println!("Calling SHA-384 on {}", value_to_hash);
+    println!("Calling SHA-384 on {value_to_hash}");
     
     let result = match sha384(cryptol_client, value_to_hash) {
         Ok(r)  => r,
-        Err(e) => panic!("An error occured while calling sha384: {}", e),
+        Err(e) => panic!("An error occured while calling sha384: {e}"),
     };
         
-    println!("Hash: {}", result);
+    println!("Hash: {result}");
 }
 
 #[cfg(test)]
@@ -74,12 +74,12 @@ mod sha384_tests {
     fn test_call_sha384_success() {
         let cryptol_client = match CryptolClient::connect() {
             Ok(c) => c,
-            Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {}", e),
+            Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {e}"),
         };
         
         let result = match sha384(cryptol_client, "0x0001") {
             Ok(r)  => r,
-            Err(e) => panic!("An error occured while calling sha384: {}", e),
+            Err(e) => panic!("An error occured while calling sha384: {e}"),
         };
         
         assert_eq!(result, "0x5d13bb39a64c4ee16e0e8d2e1c13ec4731ff1ac69652c072d0cdc355eb9e0ec41b08aef3dd6fe0541e9fa9e3dcc80f7b");
@@ -89,7 +89,7 @@ mod sha384_tests {
     fn test_call_sha384_failure() {
         let cryptol_client = match CryptolClient::connect() {
             Ok(c)  => c,
-            Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {}", e),
+            Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {e}"),
         };
         
         match sha384(cryptol_client, "not a number") {

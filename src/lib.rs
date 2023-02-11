@@ -94,7 +94,7 @@ impl CryptolClient {
         // Deduce whether or not `CRYPTOL_SERVER_URL` is defined.
         let cryptol_server_url = match env::var("CRYPTOL_SERVER_URL") {
             Ok(val) => {
-                println!("Attempting to connect to cryptol-remote-api at {}.", val);
+                println!("Attempting to connect to cryptol-remote-api at {val}.");
                 val
             },
             Err(e)  => return Err(e.into()),
@@ -123,7 +123,7 @@ impl CryptolClient {
         // stateful connection
         Ok(CryptolClient { client
                          , state: response.state.clone()
-                         , answer: response.answer.clone()
+                         , answer: response.answer
                          })
     }
 
@@ -155,7 +155,7 @@ impl CryptolClient {
         self.state = response.state.clone();
         
         // Update the CryptolClient answer.
-        self.answer = response.answer.clone();
+        self.answer = response.answer;
 
         Ok(())
     }
