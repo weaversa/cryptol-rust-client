@@ -9,7 +9,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Rust Tests
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain
         with: 
           toolchain: stable
           components: rustfmt
