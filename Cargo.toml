@@ -2,6 +2,8 @@
 name = "cryptol_client"
 version = "0.1.0"
 edition = "2021"
+license = "BSD-3-Clause"
+description = "`cryptol_client` is a collection of utilities for connecting to and interacting with a running `cryptol-remote-api` instance."
 
 [lib]
 name = "cryptol_client"

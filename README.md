@@ -1,10 +1,7 @@
 # Rust Cryptol Client
 
-[![Cargo tests](https://github.com/weaversa/cryptol-rust-client/actions/workflows/rust-test.yml/badge.svg)](https://github.com/weaversa/cryptol-rust-client/actions/workflows/rust-test.yml)
-[![Clippy](https://github.com/weaversa/cryptol-rust-client/actions/workflows/clippy-test.yml/badge.svg)](https://github.com/weaversa/cryptol-rust-client/actions/workflows/clippy-test.yml)
-[![docker](https://github.com/weaversa/cryptol-rust-client/actions/workflows/docker.yml/badge.svg)](https://github.com/weaversa/cryptol-rust-client/actions/workflows/docker.yml)
-[![Docs Build and Test](https://github.com/weaversa/cryptol-rust-client/actions/workflows/doc-test.yml/badge.svg)](https://github.com/weaversa/cryptol-rust-client/actions/workflows/doc-test.yml)
-[![Rust Formatter](https://github.com/weaversa/cryptol-rust-client/actions/workflows/rustfmt-test.yml/badge.svg)](https://github.com/weaversa/cryptol-rust-client/actions/workflows/rustfmt-test.yml)
+[![Build, Test, Publish](https://github.com/weaversa/cryptol-rust-client/actions/workflows/main.yml/badge.svg)](https://github.com/weaversa/cryptol-rust-client/actions/workflows/main.yml)
+[![Docker](https://github.com/weaversa/cryptol-rust-client/actions/workflows/docker.yml/badge.svg)](https://github.com/weaversa/cryptol-rust-client/actions/workflows/docker.yml)
 
 # Tests
 
