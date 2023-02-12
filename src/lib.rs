@@ -3,6 +3,8 @@
 //! `cryptol_client` is a collection of utilities for connecting
 //! to and interacting with a running `cryptol-remote-api` instance.
 
+#![forbid(unsafe_code)]
+
 use std::env;
 
 use serde::{Deserialize, Serialize};
@@ -80,14 +82,13 @@ pub struct CryptolClient {
 
 impl CryptolClient {
     /// This function establishes an HTTP connection with
-    /// `cryptol-remote-api` located at CRYPTOL_SERVER_URL. Upon
+    /// `cryptol-remote-api` located at `CRYPTOL_SERVER_URL`. Upon
     /// connection, `cryptol-remote-api` will load the Cryptol prelude
-    /// return a token representing the state of the connection.
+    /// and return a token representing the state of the connection.
     ///
-    /// This function has asynchronous behavior due to the POST request
-    /// to `cryptol-remote-api`. We block on the request using
-    /// #[tokio::main].
-
+    /// This function has asynchronous behavior due to the POST
+    /// request to `cryptol-remote-api`. #[tokio::main] waits for the
+    /// request to complete.
     #[tokio::main]
     pub async fn connect() -> Result<CryptolClient> {
         // Deduce whether or not `CRYPTOL_SERVER_URL` is defined.
@@ -130,15 +131,14 @@ impl CryptolClient {
     /// This function sends requests to `cryptol-remote-api` in the form
     /// of a given action and parameters.
     ///
-    /// This function has asynchronous behavior due to the POST request
-    /// to `cryptol-remote-api`. We block on the request using
-    /// #[tokio::main].
+    /// This function has asynchronous behavior due to the POST
+    /// request to `cryptol-remote-api`. #[tokio::main] waits for the
+    /// request to complete.
     ///
     /// Sample JSON for this:
     ///   `{"function": "sha384", "arguments": ["1 : [16]"], "state": "7dc51618-e655-49a3-9a72-880eeb8e16dd"}`
     ///
     ///   `{"answer":{"type":{"forall":[],"propositions":[],"type":{"type":"bitvector","width":{"type":"number","value":384}}},"type string":"[384]","value":{"data":"5d13bb39a64c4ee16e0e8d2e1c13ec4731ff1ac69652c072d0cdc355eb9e0ec41b08aef3dd6fe0541e9fa9e3dcc80f7b","encoding":"hex","expression":"bits","width":384}},"state":"fa57d2ec-afa8-4d7a-b1f2-f3b47412f13d","stderr":"","stdout":""}`
-
     #[tokio::main]
     async fn request(&mut self, action: &str, params: ObjectParams) -> Result<()> {
         // Make a request to `cryptol-remote-api` to load the Cryptol prelude
