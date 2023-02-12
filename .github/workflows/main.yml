@@ -10,6 +10,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: [rustfmt, clippy]
       - run: cargo build
 
   cargo-fmt:
@@ -17,10 +19,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with: 
-          components: rustfmt
       - run: cargo fmt --all -- --check
 
   cargo-clippy:
@@ -29,10 +27,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with: 
-          components: clippy
       - run: cargo clippy --all-targets --all-features -- -Dclippy::all -Dclippy::pedantic
 
   cargo-doc:
@@ -41,8 +35,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
       - run: cargo doc --no-deps
 
   cargo-test:
@@ -60,8 +52,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
       - run: cargo test --all-targets
         env:
           CRYPTOL_SERVER_URL: http://0.0.0.0:8080
@@ -73,8 +63,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
       - run: cargo publish --token ${CRATES_IO_TOKEN}
         env:
-          CRATES_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+          CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
