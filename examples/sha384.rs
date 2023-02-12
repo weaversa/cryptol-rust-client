@@ -29,8 +29,8 @@ fn sha384(mut cryptol_client: CryptolClient, input: &str) -> Result<String> {
     cryptol_client.load_module("SuiteB")?;
 
     // Add the input to the list of input parameters and call Cryptol's `sha384`.
-    let arguments = vec![input];
-    let answer = cryptol_client.call("sha384", arguments)?;
+    let arguments = [input];
+    let answer = cryptol_client.call("sha384", &arguments)?;
 
     // Transform the resulting JSON into a `SHA384ResultValue` type.
     let sha384_result: SHA384ResultValue = serde_json::from_value(answer.value).unwrap();

@@ -16,7 +16,7 @@ use std::time::Duration;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-/// This structure represents the JSON blob returned by cryptol-remote-api.
+/// This structure represents the JSON blob returned by `cryptol-remote-api`.
 /// For example:
 ///   `{"answer":[],"state":"a4909ccf-3ef9-45cc-913b-57e58da75788","stderr":"","stdout":""}`
 
@@ -39,7 +39,7 @@ pub struct Answer {
 }
 
 /// This structure represents the JSON blob returned by
-/// cryptol-remote-api on error.  However, there is currently no way
+/// `cryptol-remote-api` on error.  However, there is currently no way
 /// to access this information using the `jsonrpsee` crate.
 ///
 /// Example JSON blob:
@@ -79,13 +79,14 @@ pub struct CryptolClient {
 /// Cryptol client implementation.
 
 impl CryptolClient {
+    
     /// This function establishes an HTTP connection with
-    /// cryptol-remote-api located at CRYPTOL_SERVER_URL. Upon
-    /// connection, cryptol-remote-api will load the Cryptol prelude
+    /// `cryptol-remote-api` located at CRYPTOL_SERVER_URL. Upon
+    /// connection, `cryptol-remote-api` will load the Cryptol prelude
     /// return a token representing the state of the connection.
     ///
     /// This function has asynchronous behavior due to the POST request
-    /// to cryptol-remote-api. We block on the request using
+    /// to `cryptol-remote-api`. We block on the request using
     /// #[tokio::main].
 
     #[tokio::main]
@@ -112,10 +113,10 @@ impl CryptolClient {
 
         // Create parameters for loading the Cryptol prelude.
         let mut params = ObjectParams::new();
-        params.insert("state", json!(null)).unwrap();
-        params.insert("module name", "Cryptol").unwrap();
+        params.insert("state", json!(null))?;
+        params.insert("module name", "Cryptol")?;
 
-        // Make a request to cryptol-remote-api to load the Cryptol prelude
+        // Make a request to `cryptol-remote-api` to load the Cryptol prelude
         let response: CryptolResult = client.request("load module", params).await?;
 
         // Create and return a new CryptolClient object to represent the
@@ -127,11 +128,11 @@ impl CryptolClient {
         })
     }
 
-    /// This function sends requests to cryptol-remote-api in the form
+    /// This function sends requests to `cryptol-remote-api` in the form
     /// of a given action and parameters.
     ///
     /// This function has asynchronous behavior due to the POST request
-    /// to cryptol-remote-api. We block on the request using
+    /// to `cryptol-remote-api`. We block on the request using
     /// #[tokio::main].
     ///
     /// Sample JSON for this:
@@ -141,7 +142,7 @@ impl CryptolClient {
 
     #[tokio::main]
     async fn request(&mut self, action: &str, params: ObjectParams) -> Result<()> {
-        // Make a request to cryptol-remote-api to load the Cryptol prelude
+        // Make a request to `cryptol-remote-api` to load the Cryptol prelude
         let response: CryptolResult = self.client.request(action, params).await?;
 
         // It would be nice to parse out any failure from this
@@ -161,15 +162,20 @@ impl CryptolClient {
     }
 
     /// This function loads the given Cryptol module existing in the
-    /// CRYPTOL_PATH of cryptol-remote-api.
-
+    /// `CRYPTOL_PATH` of `cryptol-remote-api`.
+    ///
+    /// # Errors
+    ///
+    /// The function returns an error if the POST request to
+    /// `cryptol-remote-api` fails.
+    
     pub fn load_module(&mut self, module: &str) -> Result<()> {
         // Create parameters for loading the given Cryptol module.
         let mut params = ObjectParams::new();
-        params.insert("state", json!(self.state)).unwrap();
-        params.insert("module name", module).unwrap();
+        params.insert("state", json!(self.state))?;
+        params.insert("module name", module)?;
 
-        // Make a request to cryptol-remote-api to load the Cryptol prelude
+        // Make a request to `cryptol-remote-api` to load the given module
         self.request("load module", params)?;
 
         Ok(())
@@ -177,19 +183,24 @@ impl CryptolClient {
 
     /// This function calls the given function in the loaded Cryptol
     /// module.
-
-    pub fn call<P: Serialize>(&mut self, function: &str, arguments: Vec<P>) -> Result<Answer> {
+    ///
+    /// # Errors
+    ///
+    /// The function returns an error if the POST request to
+    /// `cryptol-remote-api` fails.
+    
+    pub fn call<P: Serialize>(&mut self, function: &str, arguments: &[P]) -> Result<Answer> {
         // Create parameters for loading the given Cryptol module.
         let mut params = ObjectParams::new();
-        params.insert("state", json!(self.state)).unwrap();
-        params.insert("function", json!(function)).unwrap();
-        params.insert("arguments", json!(arguments)).unwrap();
+        params.insert("state", json!(self.state))?;
+        params.insert("function", json!(function))?;
+        params.insert("arguments", json!(arguments))?;
 
-        // Make a request to cryptol-remote-api to load the Cryptol prelude
+        // Make a request to `cryptol-remote-api` to call the given function
         self.request("call", params)?;
 
         // Let `call` return the result as an Answer struct.
-        let answer: Answer = serde_json::from_value(self.answer.clone()).unwrap();
+        let answer: Answer = serde_json::from_value(self.answer.clone())?;
 
         Ok(answer)
     }

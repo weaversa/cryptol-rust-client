@@ -26,9 +26,8 @@ fn test_load_module_failure() {
         Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {e}"),
     };
 
-    if cryptol_client.load_module("nosuchmodule").is_ok() {
-        panic!("nosuchmodule should not exist")
-    }
+    assert!(cryptol_client.load_module("nosuchmodule").is_err(),
+            "nosuchmodule should not exist");
 }
 
 #[test]
@@ -39,9 +38,9 @@ fn test_call_success() {
     };
 
     let function = "reverse";
-    let arguments = vec!["[1, 2, 3, 4]"];
+    let arguments = ["[1, 2, 3, 4]"];
 
-    match cryptol_client.call(function, arguments) {
+    match cryptol_client.call(function, &arguments) {
         Ok(r) => r,
         Err(e) => panic!("An error occured while calling cryptol-remote-api: {e}"),
     };
@@ -55,9 +54,8 @@ fn test_call_failure() {
     };
 
     let function = "nonsense";
-    let arguments = vec!["[1, 2, 3, 4]"];
+    let arguments = ["[1, 2, 3, 4]"];
 
-    if cryptol_client.call(function, arguments).is_ok() {
-        panic!("'nonsense' should not be a function in the Cryptol prelude")
-    }
+    assert!(cryptol_client.call(function, &arguments).is_err(),
+            "'nonsense' should not be a function in the Cryptol prelude");
 }
