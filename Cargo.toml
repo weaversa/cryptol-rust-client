@@ -1,10 +1,10 @@
 [package]
-name = "cryptol-rust-client"
+name = "cryptol_client"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "cryptol_rust_client"
+name = "cryptol_client"
 path = "src/lib.rs"
 
 [[example]]

@@ -1,6 +1,6 @@
-//! # cryptol-rust-client
+//! # `cryptol_client`
 //!
-//! `cryptol-rust-client` is a collection of utilities for connecting
+//! `cryptol_client` is a collection of utilities for connecting
 //! to and interacting with a running `cryptol-remote-api` instance.
 
 use std::env;

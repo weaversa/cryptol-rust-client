@@ -1,4 +1,4 @@
-use cryptol_rust_client::CryptolClient;
+use cryptol_client::CryptolClient;
 
 #[test]
 fn test_connect() {

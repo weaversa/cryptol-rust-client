@@ -1,9 +1,9 @@
 //! # SHA384
 //!
-//! This is a demonstration of how to use the `cryptol-rust-client`
-//! crate to call a Cryptol function via the `cryptol-remote-api`.
+//! This is a demonstration of how to use the `cryptol_client` crate
+//! to call a Cryptol function via the `cryptol-remote-api`.
 
-use cryptol_rust_client::CryptolClient;
+use cryptol_client::CryptolClient;
 use serde::{Deserialize, Serialize};
 use std::env;
 
