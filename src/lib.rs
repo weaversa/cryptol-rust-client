@@ -79,7 +79,6 @@ pub struct CryptolClient {
 /// Cryptol client implementation.
 
 impl CryptolClient {
-    
     /// This function establishes an HTTP connection with
     /// `cryptol-remote-api` located at CRYPTOL_SERVER_URL. Upon
     /// connection, `cryptol-remote-api` will load the Cryptol prelude
@@ -168,7 +167,6 @@ impl CryptolClient {
     ///
     /// The function returns an error if the POST request to
     /// `cryptol-remote-api` fails.
-    
     pub fn load_module(&mut self, module: &str) -> Result<()> {
         // Create parameters for loading the given Cryptol module.
         let mut params = ObjectParams::new();
@@ -188,7 +186,6 @@ impl CryptolClient {
     ///
     /// The function returns an error if the POST request to
     /// `cryptol-remote-api` fails.
-    
     pub fn call<P: Serialize>(&mut self, function: &str, arguments: &[P]) -> Result<Answer> {
         // Create parameters for loading the given Cryptol module.
         let mut params = ObjectParams::new();

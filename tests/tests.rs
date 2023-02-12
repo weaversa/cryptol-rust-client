@@ -26,8 +26,10 @@ fn test_load_module_failure() {
         Err(e) => panic!("An error occurred while connecting to cryptol-remote-api: {e}"),
     };
 
-    assert!(cryptol_client.load_module("nosuchmodule").is_err(),
-            "nosuchmodule should not exist");
+    assert!(
+        cryptol_client.load_module("nosuchmodule").is_err(),
+        "nosuchmodule should not exist"
+    );
 }
 
 #[test]
@@ -56,6 +58,8 @@ fn test_call_failure() {
     let function = "nonsense";
     let arguments = ["[1, 2, 3, 4]"];
 
-    assert!(cryptol_client.call(function, &arguments).is_err(),
-            "'nonsense' should not be a function in the Cryptol prelude");
+    assert!(
+        cryptol_client.call(function, &arguments).is_err(),
+        "'nonsense' should not be a function in the Cryptol prelude"
+    );
 }
