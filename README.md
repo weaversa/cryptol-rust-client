@@ -14,7 +14,7 @@ instance.
 
 This project uses a number of mechanisms for increasing its assurance.
 
-  - #![forbid(unsafe_code)] is used to ensure the use of safe Rust,
+  - `#![forbid(unsafe_code)]` is used to ensure the use of safe Rust,
   - the [`clippy`](https://github.com/rust-lang/rust-clippy) linter is
     used at the pedantic level,
   - the [rust formatter](https://github.com/rust-lang/rustfmt) is used
